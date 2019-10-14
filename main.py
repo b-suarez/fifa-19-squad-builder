@@ -1,19 +1,14 @@
 import pandas as pd
-import numpy as np 
+import numpy as np
+import squadbuilder as sqb
 
-def returnBestKeeper(availablePlayers):
-    goodReflexes = fifa19_pd.GKReflexes >=85
-    goodPositioning = fifa19_pd.GKPositioning >=85
-    return availablePlayers[goodPositioning][goodReflexes]
-
-    
-      
-    
+builder = sqb.SquadBuilder("datasets/fifa19.csv")
+builder.get_best_player("GK")
 
 
-fifa19_pd = pd.read_csv("datasets/fifa19.csv")
-
-
-print(returnBestKeeper(fifa19_pd))
-
-
+# def returnBestKeeper(availablePlayers):
+#     goodReflexes = fifa19_pd.GKReflexes >=85
+#     goodPositioning = fifa19_pd.GKPositioning >=85
+#     return availablePlayers[goodPositioning][goodReflexes]
+# print(str(fifa19_pd.Name[fifa19_pd.GKPositioning ==
+# fifa19_pd.GKPositioning.max()]))
