@@ -17,6 +17,8 @@ class SquadBuilder:
         self.data = pd.read_csv(CSVPath)
 
     def get_best_player(self, position, budget="300"):
+        """Given a player position and a budget, returns a dictionary with
+        the best available player"""
 
         if position:
             player_df = self.data.loc[self.data.Position == position]
