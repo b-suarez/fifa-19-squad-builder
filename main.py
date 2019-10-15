@@ -3,7 +3,7 @@ import numpy as np
 import squadbuilder as sqb
 
 builder = sqb.SquadBuilder("datasets/fifa19.csv")
-builder.get_best_player("GK")
+builder.get_best_player("CB", 30)
 
 
 # def returnBestKeeper(availablePlayers):

@@ -7,33 +7,48 @@ class SquadBuilder:
     # Initialize empty Dataframe
     data = pd.DataFrame()
 
-    positionsDictionary = {
+    positions_dict = {
         "GK": ["GKDiving", "GKHandling", "GKReflexes"],
-        "CB": ["Standing Tackle", "Strenght", "Balance", "Acceleration"]
+        "CB": ["StandingTackle", "Strength", "Balance", "Acceleration"]
     }
 
     def __init__(self, CSVPath):
         """Initializes Squad Builder object given the correct CSV path"""
         self.data = pd.read_csv(CSVPath)
 
-    def get_best_player(self, position, budget="200M"):
-        if(position == "GK"):
+    def get_best_player(self, position, budget="300"):
 
-            goalkeepers_df = self.data.loc[self.data.Position == "GK"]
+        if position:
+            player_df = self.data.loc[self.data.Position == position]
+            best_player_available = dict()
+            best_avg_att = 0.0
 
-            for index, row in goalkeepers_df.iterrows():
+            for index, row in player_df.iterrows():
                 avg_key_att = 0.0
-                for value in self.positionsDictionary["GK"]:
-                    avg_key_att = avg_key_att + float(row[value])
 
-                avg_key_att = (avg_key_att /
-                               aux.count_values_dict_key(
-                                                      self.positionsDictionary,
-                                                      "GK"))
-                if(avg_key_att >= 80):
-                    print("Average: " + str(avg_key_att))
+                if self.__get_float_from_value(row["Value"]) <= budget:
+                    for value in self.positions_dict[position]:
+                        avg_key_att = avg_key_att + float(row[value])
 
-        return "NULL"
+                    avg_key_att = (avg_key_att /
+                                   aux.count_values_dict_keys(
+                                       self.positions_dict, position))
 
-    def _get_float_from_value(value):
-        value.replace("M", "")
+                    if avg_key_att >= best_avg_att:
+                        best_avg_att = avg_key_att
+                        best_player_available = row
+
+        return best_player_available
+
+    def __get_float_from_value(self, value):
+        """Giving a table value with format
+        "€ VALUE M" returns the value as a float"""
+
+        if "K" in value:
+            str_value = value.replace("K", "").replace("€", "")
+            float_value = float(str_value)/1000
+        else:
+            str_value = value.replace("M", "").replace("€", "")
+            float_value = float(str_value)
+
+        return float_value
