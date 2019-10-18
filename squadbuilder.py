@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import aux
+import matplotlib.pyplot as plt
 
 
 class SquadBuilder:
@@ -16,6 +17,15 @@ class SquadBuilder:
         """Initializes Squad Builder object given the correct CSV path"""
         self.data = pd.read_csv(CSVPath)
 
+        self.data["Value"] = self.data["Value"].apply(
+            self.__get_float_from_value)
+
+        # print(self.data['Release Clause'])
+
+        # self.data["Release Clause"] = self.data["Release Clause"].apply(
+        #     self.__get_float_from_value)
+        # print(self.data.head())
+
     def get_best_player(self, position, budget="300"):
         """Given a player position and a budget, returns a dictionary with
         the best available player"""
@@ -28,7 +38,7 @@ class SquadBuilder:
             for index, row in player_df.iterrows():
                 avg_key_att = 0.0
 
-                if self.__get_float_from_value(row["Value"]) <= budget:
+                if row["Value"] <= budget:
                     for value in self.positions_dict[position]:
                         avg_key_att = avg_key_att + float(row[value])
 
@@ -42,15 +52,22 @@ class SquadBuilder:
 
         return best_player_available
 
+    # def get_best_deals(dataframe):
+    #     for index, row in dataframe:
+    #         if dataframe['']
+
     def __get_float_from_value(self, value):
-        """Giving a table value with format
-        "€ VALUE M" returns the value as a float"""
+        """Giving a string with format
+        "/€/d{x}/M" returns the value as a float"""
+        if value:
+            if "K" in value:
+                str_value = value.replace("K", "").replace("€", "")
+                float_value = float(str_value)/1000
+            else:
+                str_value = value.replace("M", "").replace("€", "")
+                float_value = float(str_value)
 
-        if "K" in value:
-            str_value = value.replace("K", "").replace("€", "")
-            float_value = float(str_value)/1000
+            return float_value
+
         else:
-            str_value = value.replace("M", "").replace("€", "")
-            float_value = float(str_value)
-
-        return float_value
+            return 'NaN'
