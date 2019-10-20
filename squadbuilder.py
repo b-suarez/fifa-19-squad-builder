@@ -9,36 +9,69 @@ class SquadBuilder:
     data = pd.DataFrame()
 
     positions_dict = {
-        "GK": ["GKDiving", "GKHandling", "GKReflexes"],
-        "CB": ["StandingTackle", "Strength", "Balance", "Acceleration"]
+        "GK": ["gkdiving", "gkhandling", "gkreflexes"],
+        "CB": ["standingtackle", "strength", "balance", "acceleration",
+               "interceptions", "marking"],
+        "RB": ["stamina", "marking", "slidingtackle", "acceleration",
+               "sprintspeed", "crossing"],
+        "LB": ["stamina", "marking", "slidingtackle", "acceleration",
+               "sprintspeed", "crossing"],
+        "CM": ["ballcontrol", "balance", "positioning", "vision",
+               "shortpassing", "longshots"],
+        "CDM": ["ballcontrol", "balance", "positioning", "strength",
+                "longpassing", "marking", "standingtackle"],
+        "RW": ["sprintspeed", "dribbling", "acceleration", "agility",
+               "ballcontrol", "crossing", "finishing"],
+        "LW": ["sprintspeed", "dribbling", "acceleration", "agility",
+               "ballcontrol", "crossing", "finishing"],
+        "ST": ["finishing", "headingaccuracy", "volleys", "acceleration",
+               "shotpower", "jumping", "ballcontrol", "sprintspeed"]
     }
 
     def __init__(self, CSVPath):
         """Initializes Squad Builder object given the correct CSV path"""
         self.data = pd.read_csv(CSVPath)
 
-        self.data["Value"] = self.data["Value"].apply(
+        self.data.columns = map(str.lower, self.data.columns)
+        self.data.columns = self.data.columns.str.replace(' ', '')
+
+        self.data["value"] = self.data["value"].apply(
             self.__get_float_from_value)
 
-        # print(self.data['Release Clause'])
+        self.data["missingreleaseclause"] = (
+            self.data["releaseclause"].isnull()
+        )
 
-        # self.data["Release Clause"] = self.data["Release Clause"].apply(
-        #     self.__get_float_from_value)
-        # print(self.data.head())
+    def get_best_deals(self):
+        df_release_clauses = self.data.dropna(subset=["releaseclause"])
+
+        df_release_clauses["releaseclause"] = (
+            df_release_clauses["releaseclause"].apply(
+                self.__get_float_from_value
+            )
+        )
+
+        for index, value in df_release_clauses.iterrows():
+            if value['value'] < self.__get_float_from_value(
+                    value['release_clause']
+            ):
+                print(value['name'] + "is valued in " + str(value['value']) +
+                      "M but his release clause is " +
+                      str(value['release clause']))
 
     def get_best_player(self, position, budget="300"):
         """Given a player position and a budget, returns a dictionary with
         the best available player"""
 
         if position:
-            player_df = self.data.loc[self.data.Position == position]
+            player_df = self.data.loc[self.data.position == position]
             best_player_available = dict()
             best_avg_att = 0.0
 
             for index, row in player_df.iterrows():
                 avg_key_att = 0.0
 
-                if row["Value"] <= budget:
+                if row["value"] <= budget:
                     for value in self.positions_dict[position]:
                         avg_key_att = avg_key_att + float(row[value])
 
@@ -49,6 +82,7 @@ class SquadBuilder:
                     if avg_key_att >= best_avg_att:
                         best_avg_att = avg_key_att
                         best_player_available = row
+                        print(best_player_available["name"])
 
         return best_player_available
 
@@ -71,3 +105,15 @@ class SquadBuilder:
 
         else:
             return 'NaN'
+
+    def __get_has_release_clause(self, df):
+        has_release_clause = []
+        for index, row in df.iterrows():
+            if(row['Release Clause'] != 'NaN'):
+                has_release_clause.append('1')
+
+            else:
+                has_release_clause.append('0')
+                print('DASIDNSAUIDBNIAS')
+
+        return has_release_clause
