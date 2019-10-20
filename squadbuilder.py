@@ -92,6 +92,12 @@ class SquadBuilder:
 
         return best_player_available
 
+    def overall_histogram(self):
+        self.data.plot(y="overall", kind="hist", bins=100)
+        plt.xlabel("Player Overall")
+        plt.ylabel("Number of Players")
+        plt.show()
+
     def __get_float_from_value(self, value):
         """Giving a string with format
         "/€/d{x}/M" returns the value as a float"""
