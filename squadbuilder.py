@@ -32,12 +32,19 @@ class SquadBuilder:
         """Initializes Squad Builder object given the correct CSV path"""
         self.data = pd.read_csv(CSVPath)
 
+        # Set column names as lowercase without spaces
         self.data.columns = map(str.lower, self.data.columns)
         self.data.columns = self.data.columns.str.replace(' ', '')
 
+        # Remove unnamed column
+        self.data = self.data.loc[:, ~
+                                  self.data.columns.str.contains('^unnamed')]
+
+        # Convert value column to float64
         self.data["value"] = self.data["value"].apply(
             self.__get_float_from_value)
 
+        # Add missingreleaseclause column
         self.data["missingreleaseclause"] = (
             self.data["releaseclause"].isnull()
         )
@@ -82,29 +89,20 @@ class SquadBuilder:
                     if avg_key_att >= best_avg_att:
                         best_avg_att = avg_key_att
                         best_player_available = row
-                        print(best_player_available["name"])
 
         return best_player_available
-
-    # def get_best_deals(dataframe):
-    #     for index, row in dataframe:
-    #         if dataframe['']
 
     def __get_float_from_value(self, value):
         """Giving a string with format
         "/€/d{x}/M" returns the value as a float"""
-        if value:
-            if "K" in value:
-                str_value = value.replace("K", "").replace("€", "")
-                float_value = float(str_value)/1000
-            else:
-                str_value = value.replace("M", "").replace("€", "")
-                float_value = float(str_value)
+        if "K" in value:
+            str_value = value.replace("K", "").replace("€", "")
+            float_value = float(str_value)/1000
+        else:
+            str_value = value.replace("M", "").replace("€", "")
+            float_value = float(str_value)
 
             return float_value
-
-        else:
-            return 'NaN'
 
     def __get_has_release_clause(self, df):
         has_release_clause = []
