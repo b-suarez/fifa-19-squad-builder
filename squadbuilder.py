@@ -45,9 +45,10 @@ class SquadBuilder:
             self.__get_float_from_value)
 
         # Add missingreleaseclause column
-        self.data["missingreleaseclause"] = (
-            self.data["releaseclause"].isnull()
+        self.data["hasreleaseclause"] = (
+            self.data["releaseclause"].notnull()
         )
+        print(self.data.head())
 
     def get_best_deals(self):
         df_release_clauses = self.data.dropna(subset=["releaseclause"])
@@ -121,3 +122,7 @@ class SquadBuilder:
                 print('DASIDNSAUIDBNIAS')
 
         return has_release_clause
+
+    def get_cheapest_player_by_overall():
+        TODO
+        return null
